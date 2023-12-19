@@ -284,6 +284,15 @@ public class Order extends AggregateRoot<UUID> {
         setUpdatedAt(getCurrentZonedDateTime());
     }
 
+    // pick order
+    public void pickOrder(PickupperId pickupperId) {
+        if (orderStatus == CREATED) {
+            setUpdatedAt(getCurrentZonedDateTime());
+            setOrderStatus(PICKED);
+            setPickupperId(pickupperId);
+        } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
+    }
+
     // delete order
     public void deleteOrder() {
         if (orderStatus == CREATED) {
@@ -337,6 +346,15 @@ public class Order extends AggregateRoot<UUID> {
         if (orderStatus == RETURNING) {
             setUpdatedAt(getCurrentZonedDateTime());
             setOrderStatus(RETURNED);
+        } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
+    }
+
+    // order failed
+    public void orderFailed(String FailureReason) {
+        if (orderStatus == OUT_FOR_DELIVERY) {
+            setUpdatedAt(getCurrentZonedDateTime());
+            setOrderStatus(FAILED);
+            errorMessages.add(FailureReason);
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 

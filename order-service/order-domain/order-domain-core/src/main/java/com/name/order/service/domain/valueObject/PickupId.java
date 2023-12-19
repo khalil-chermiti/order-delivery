@@ -5,7 +5,7 @@ import com.name.domain.valueObject.BaseId;
 import java.util.UUID;
 
 public class PickupId extends BaseId<UUID> {
-    protected PickupId(UUID value) {
+    public PickupId(UUID value) {
         super(value);
     }
 }

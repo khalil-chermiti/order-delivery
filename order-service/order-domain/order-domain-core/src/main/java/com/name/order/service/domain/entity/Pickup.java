@@ -15,7 +15,7 @@ import java.util.UUID;
 public class Pickup extends AggregateRoot<UUID> {
     private BusinessId businessId;
     private PickupperId pickupperId;
-    private List<OrderId> orders;
+    private List<Order> orders;
 
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
@@ -40,7 +40,7 @@ public class Pickup extends AggregateRoot<UUID> {
     public static final class Builder {
         private BusinessId businessId;
         private PickupperId pickupperId;
-        private List<OrderId> orders;
+        private List<Order> orders;
         private ZonedDateTime createdAt;
         private ZonedDateTime updatedAt;
         private PickupAddressId pickupAddressId;
@@ -61,7 +61,7 @@ public class Pickup extends AggregateRoot<UUID> {
             return this;
         }
 
-        public Builder setOrders(List<OrderId> val) {
+        public Builder setOrders(List<Order> val) {
             orders = val;
             return this;
         }
@@ -117,11 +117,11 @@ public class Pickup extends AggregateRoot<UUID> {
         this.pickupperId = pickupperId;
     }
 
-    public List<OrderId> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<OrderId> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 
@@ -192,10 +192,11 @@ public class Pickup extends AggregateRoot<UUID> {
     }
 
     // pick up pickup
-    public void pickUp() {
+    public void pickUp(PickupperId pickupperId) {
         if (pickupStatus == PickupStatus.CREATED) {
             setUpdatedAt(getCurrentZonedDateTime());
             setPickupStatus(PickupStatus.PICKED);
+            setPickupperId(pickupperId);
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_PICKUP_STATUS);
     }
 
@@ -208,10 +209,10 @@ public class Pickup extends AggregateRoot<UUID> {
     }
 
     private void validatePickup() {
-        if(businessId == null)
+        if (businessId == null)
             throw new DomainException(OrderDomainErrorMessages.NO_BUSINESS_ADDRESS);
 
-        if(orders.isEmpty())
+        if (orders.isEmpty())
             throw new DomainException(OrderDomainErrorMessages.PICKUP_HAS_NO_ORDER);
     }
 
