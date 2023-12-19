@@ -1,4 +1,11 @@
 package com.name.order.service.domain.event.order;
 
-public class OrderCreatedEvent {
+import com.name.order.service.domain.entity.Order;
+
+import java.time.ZonedDateTime;
+
+public class OrderCreatedEvent extends OrderEvent{
+    public OrderCreatedEvent(Order order, ZonedDateTime createdAt) {
+        super(order, createdAt);
+    }
 }
