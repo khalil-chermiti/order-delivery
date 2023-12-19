@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.name.order.service.domain.valueObject.PickupStatus.*;
+
 public class Pickup extends AggregateRoot<UUID> {
     private BusinessId businessId;
     private PickupperId pickupperId;
@@ -105,16 +107,8 @@ public class Pickup extends AggregateRoot<UUID> {
         return businessId;
     }
 
-    public void setBusinessId(BusinessId businessId) {
-        this.businessId = businessId;
-    }
-
     public PickupperId getPickupperId() {
         return pickupperId;
-    }
-
-    public void setPickupperId(PickupperId pickupperId) {
-        this.pickupperId = pickupperId;
     }
 
     public List<Order> getOrders() {
@@ -129,82 +123,53 @@ public class Pickup extends AggregateRoot<UUID> {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public ZonedDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public PickupAddressId getPickupAddressId() {
         return pickupAddressId;
     }
 
-    public void setPickupAddressId(PickupAddressId pickupAddressId) {
-        this.pickupAddressId = pickupAddressId;
-    }
-
     public ZonedDateTime getPickupDate() {
         return pickupDate;
-    }
-
-    public void setPickupDate(ZonedDateTime pickupDate) {
-        this.pickupDate = pickupDate;
     }
 
     public String getPickupPhone() {
         return pickupPhone;
     }
 
-    public void setPickupPhone(String pickupPhone) {
-        this.pickupPhone = pickupPhone;
-    }
-
     public List<String> getErrorMessages() {
         return errorMessages;
-    }
-
-    public void setErrorMessages(List<String> errorMessages) {
-        this.errorMessages = errorMessages;
     }
 
     public PickupStatus getPickupStatus() {
         return pickupStatus;
     }
 
-    public void setPickupStatus(PickupStatus pickupStatus) {
-        this.pickupStatus = pickupStatus;
-    }
-
-    // init pickup
     public void initPickup() {
         validatePickup();
         setId(UUID.randomUUID());
-        setPickupStatus(PickupStatus.CREATED);
-        setCreatedAt(getCurrentZonedDateTime());
-        setUpdatedAt(getCurrentZonedDateTime());
-        setErrorMessages(new ArrayList<>());
+        pickupStatus = CREATED;
+        createdAt = getCurrentZonedDateTime();
+        updatedAt = getCurrentZonedDateTime();
+        errorMessages = new ArrayList<>();
     }
 
     // pick up pickup
     public void pickUp(PickupperId pickupperId) {
-        if (pickupStatus == PickupStatus.CREATED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setPickupStatus(PickupStatus.PICKED);
-            setPickupperId(pickupperId);
+        if (pickupStatus == CREATED) {
+            updatedAt = getCurrentZonedDateTime();
+            pickupStatus = PICKED;
+            this.pickupperId = pickupperId;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_PICKUP_STATUS);
     }
 
     // cancel pickup
     public void cancelPickup() {
         if (pickupStatus == PickupStatus.PICKED || pickupStatus == PickupStatus.DELIVERING) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setPickupStatus(PickupStatus.CANCELLED);
+            updatedAt = getCurrentZonedDateTime();
+            pickupStatus = CANCELLED;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_PICKUP_STATUS);
     }
 

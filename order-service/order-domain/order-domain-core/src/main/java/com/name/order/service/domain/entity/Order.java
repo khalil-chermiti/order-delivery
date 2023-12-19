@@ -59,112 +59,64 @@ public class Order extends AggregateRoot<UUID> {
         return businessId;
     }
 
-    public void setBusinessId(BusinessId businessId) {
-        this.businessId = businessId;
-    }
 
     public PickupId getPickupId() {
         return pickupId;
     }
 
-    public void setPickupId(PickupId pickupId) {
-        this.pickupId = pickupId;
-    }
 
     public PickupperId getPickupperId() {
         return pickupperId;
     }
 
-    public void setPickupperId(PickupperId pickupperId) {
-        this.pickupperId = pickupperId;
-    }
 
     public DeliveryManId getDeliveryManId() {
         return deliveryManId;
     }
 
-    public void setDeliveryManId(DeliveryManId deliveryManId) {
-        this.deliveryManId = deliveryManId;
-    }
 
     public Money getPrice() {
         return price;
     }
 
-    public void setPrice(Money price) {
-        this.price = price;
-    }
 
     public Weight getWeight() {
         return weight;
-    }
-
-    public void setWeight(Weight weight) {
-        this.weight = weight;
     }
 
     public Integer getNumberOfItems() {
         return numberOfItems;
     }
 
-    public void setNumberOfItems(Integer numberOfItems) {
-        this.numberOfItems = numberOfItems;
-    }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
-    }
 
     public ZonedDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public ZonedDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public Address getClientAddress() {
         return clientAddress;
-    }
-
-    public void setClientAddress(Address clientAddress) {
-        this.clientAddress = clientAddress;
     }
 
     public ZonedDateTime getClientDeliveryDate() {
         return clientDeliveryDate;
     }
 
-    public void setClientDeliveryDate(ZonedDateTime clientDeliveryDate) {
-        this.clientDeliveryDate = clientDeliveryDate;
-    }
-
     public String getClientPhoneNumber() {
         return clientPhoneNumber;
-    }
-
-    public void setClientPhoneNumber(String clientPhoneNumber) {
-        this.clientPhoneNumber = clientPhoneNumber;
     }
 
     public List<String> getErrorMessages() {
@@ -278,34 +230,34 @@ public class Order extends AggregateRoot<UUID> {
     // init order
     public void initOrder() {
         setId(UUID.randomUUID());
-        setOrderStatus(CREATED);
+        orderStatus = CREATED;
         setErrorMessages(new ArrayList<>());
-        setCreatedAt(getCurrentZonedDateTime());
-        setUpdatedAt(getCurrentZonedDateTime());
+        createdAt = getCurrentZonedDateTime();
+        updatedAt = getCurrentZonedDateTime();
     }
 
     // pick order
     public void pickOrder(PickupperId pickupperId) {
         if (orderStatus == CREATED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(PICKED);
-            setPickupperId(pickupperId);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = PICKED;
+            this.pickupperId = pickupperId;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     // delete order
     public void deleteOrder() {
         if (orderStatus == CREATED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(DELETED);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = DELETED;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
 
     public void cancelOrder() {
         if (orderStatus == PICKED || orderStatus == OUT_FOR_DELIVERY) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(CANCELED);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = CANCELED;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
@@ -313,47 +265,47 @@ public class Order extends AggregateRoot<UUID> {
     // deliver order
     public void deliverOrder() {
         if (orderStatus == PICKED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(OUT_FOR_DELIVERY);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = OUT_FOR_DELIVERY;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     // order delivered
     public void orderDelivered() {
         if (orderStatus == OUT_FOR_DELIVERY) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(DELIVERED);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = DELIVERED;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     public void payOrder() {
         if (orderStatus == DELIVERED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(PAID);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = PAID;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     // returning order
     public void returningOrder() {
         if (orderStatus == FAILED || orderStatus == CANCELED) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(RETURNING);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = RETURNING;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     // order returned
     public void orderReturned() {
         if (orderStatus == RETURNING) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(RETURNED);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = RETURNED;
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
 
     // order failed
     public void orderFailed(String FailureReason) {
         if (orderStatus == OUT_FOR_DELIVERY) {
-            setUpdatedAt(getCurrentZonedDateTime());
-            setOrderStatus(FAILED);
+            updatedAt = getCurrentZonedDateTime();
+            orderStatus = FAILED;
             errorMessages.add(FailureReason);
         } else throw new OrderDomainException(OrderDomainErrorMessages.CAN_NOT_UPDATE_ORDER_STATUS);
     }
